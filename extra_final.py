@@ -47,6 +47,22 @@ for sheet_name, master_df in master_sheets.items():
             lambda x: '✅' if x in filtered_ids else ''
         )
 
+        # Siapkan mapping Jumlah Pengguna berdasarkan SongId
+        if 'Jumlah Pengguna' not in filtered_df.columns:
+            raise KeyError(f"❌ Kolom 'Jumlah Pengguna' tidak ditemukan di sheet '{sheet_name}' FilteredByLanguage.xlsx.")
+
+        pengguna_map = dict(zip(filtered_df['SongId'].astype(str), filtered_df['Jumlah Pengguna']))
+
+        # Ambil nilai 'Jumlah Pengguna' dari mapping
+        jumlah_pengguna_series = master_df['SongId'].astype(str).map(pengguna_map)
+
+        # Sisipkan kolom "Jumlah Pengguna" setelah "Top Hits"
+        top_hits_index = master_df.columns.get_loc('Top Hits')
+        cols = list(master_df.columns)
+        cols.insert(top_hits_index + 1, 'Jumlah Pengguna')
+        master_df['Jumlah Pengguna'] = jumlah_pengguna_series
+        master_df = master_df[cols]
+
         hits_count = (master_df['Top Hits'] == '✅').sum()
         print(f"✅ Ditandai {hits_count} lagu sebagai 'Top Hits' dari total {total_rows} lagu.\n")
 

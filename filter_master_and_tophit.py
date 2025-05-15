@@ -56,7 +56,12 @@ for i in tqdm(range(len(master_df)), desc="🔎 Memfilter"):
         (tophit_df['Penyanyi'] == row['gabungan'])
     ]
     if not matched.empty:
-        filtered_list.append(row)
+        # Ambil nilai Jumlah Pengguna dari hasil pencocokan pertama
+        jumlah_pengguna = matched.iloc[0]['Jumlah Pengguna'] if 'Jumlah Pengguna' in matched.columns else None
+        row_with_user = row.copy()
+        row_with_user['Jumlah Pengguna'] = jumlah_pengguna
+        filtered_list.append(row_with_user)
+
 
 
 filtered_df = pd.DataFrame(filtered_list)
